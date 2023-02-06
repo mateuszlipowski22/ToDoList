@@ -2,7 +2,12 @@
 
 
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.ListView?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="fx.mastercalss.todolist.Controller">
+    <left>
+        <ListView>
 
+        </ListView>
+    </left>
 </BorderPane>
