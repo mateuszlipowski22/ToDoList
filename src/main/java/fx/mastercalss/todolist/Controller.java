@@ -8,8 +8,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +49,29 @@ public class Controller {
         todoListView.setItems(TodoData.getInstance().getTodoItems());
         todoListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         todoListView.getSelectionModel().selectFirst();
+
+        todoListView.setCellFactory(new Callback<ListView<TodoItem>, ListCell<TodoItem>>() {
+            @Override
+            public ListCell<TodoItem> call(ListView<TodoItem> todoItemListView) {
+                ListCell<TodoItem> cell = new ListCell<TodoItem>(){
+                    @Override
+                    protected void updateItem(TodoItem item, boolean b) {
+                        super.updateItem(item, b);
+                        if(b){
+                            setText(null);
+                        }else {
+                            setText(item.getShortDescription());
+                            if(item.getDeadline().isBefore(LocalDate.now().plusDays(1))){
+                                setTextFill(Color.RED);
+                            }else if(item.getDeadline().equals(LocalDate.now().plusDays(1))){
+                                setTextFill(Color.BROWN);
+                            }
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
     }
 
     @FXML
