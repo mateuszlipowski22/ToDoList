@@ -5,5 +5,4 @@ Pickup Doug at the train station	Doug's arriving on March 22nd	22-03-2016
 Pick up dry cleaning	The cloths should be ready by Wendsday	20-04-2016
 sadas	dsadas	02-02-2023
 Another task	test task	03-02-2023
-sasa	dddddddd	09-02-2023
 dzisiaj	dzisiaj	17-02-2023
