@@ -2,8 +2,10 @@ package fx.mastercalss.todolist;
 
 import fx.mastercalss.todolist.datamodel.TodoData;
 import fx.mastercalss.todolist.datamodel.TodoItem;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -22,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class Controller {
     private List<TodoItem> todoItems;
@@ -43,6 +46,12 @@ public class Controller {
 
     @FXML
     private ToggleButton filterToggleButton;
+
+    private FilteredList<TodoItem> filteredList;
+
+    private Predicate<TodoItem> wantAllItems;
+    private Predicate<TodoItem> wantTodayItems;
+
 
     public void initialize(){
         listContextMenu = new ContextMenu();
@@ -69,7 +78,23 @@ public class Controller {
             }
         });
 
-        SortedList<TodoItem> sortedList = new SortedList<TodoItem>(TodoData.getInstance().getTodoItems(), new Comparator<TodoItem>() {
+        wantAllItems = new Predicate<TodoItem>() {
+            @Override
+            public boolean test(TodoItem item) {
+                return true;
+            }
+        };
+
+        wantTodayItems = new Predicate<TodoItem>() {
+            @Override
+            public boolean test(TodoItem item) {
+                return (item.getDeadline().equals(LocalDate.now()));
+            }
+        };
+
+        filteredList = new FilteredList<TodoItem>(TodoData.getInstance().getTodoItems(),wantAllItems);
+
+        SortedList<TodoItem> sortedList = new SortedList<TodoItem>(filteredList, new Comparator<TodoItem>() {
             @Override
             public int compare(TodoItem o1, TodoItem o2) {
                 return o1.getDeadline().compareTo(o2.getDeadline());
@@ -170,12 +195,27 @@ public class Controller {
         }
     }
 
+    @FXML
     public void handleFilterButton(){
+        TodoItem selectedItem = todoListView.getSelectionModel().getSelectedItem();
         if(filterToggleButton.isSelected()){
-
+            filteredList.setPredicate(wantTodayItems);
+            if(filteredList.isEmpty()){
+                itemDetailsTextArea.clear();
+                deadLineLabel.setText("");
+            }else if(filteredList.contains(selectedItem)){
+                todoListView.getSelectionModel().select(selectedItem);
+            }else {
+                todoListView.getSelectionModel().selectFirst();
+            }
         }else {
-
+            filteredList.setPredicate(wantAllItems);
+            todoListView.getSelectionModel().select(selectedItem);
         }
     }
 
+    @FXML
+    public void handleExit(){
+        Platform.exit();
+    }
 }
